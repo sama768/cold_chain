@@ -1,0 +1,17 @@
+{
+  "device_id": "VAULT_FRIDGE_01",
+  "timestamp": "2026-10-04T14:29:00Z",
+  "connection_type": "MQTT",
+  "battery_level": 98,
+  "telemetry": {
+    "temperature_dht": 5.2,
+    "humidity": 48.5,
+    "temperature_bmp": 5.4,
+    "pressure": 1012.3,
+    "door": "closed"
+  },
+  "rfid": [
+    {"reader_id": 1, "tag_uid": "A1B2C3D4", "product": "Vaccine_A"},
+    {"reader_id": 2, "tag_uid": "E5F6G7H8", "product": "Vaccine_B"}
+  ]
+}

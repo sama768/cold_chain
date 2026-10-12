@@ -1,0 +1,53 @@
+# Phase 1 local stack: PostgreSQL + Mosquitto + API + MQTT subscriber.
+# Run from the backend/ folder:  docker compose up --build
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: coldchain
+      POSTGRES_PASSWORD: coldchain
+      POSTGRES_DB: coldchain
+    ports:
+      - "5433:5432"   # host port 5433 avoids clashing with a PostgreSQL installed on Windows
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coldchain -d coldchain"]
+      interval: 5s
+      retries: 10
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://coldchain:coldchain@db:5432/coldchain
+      DEVICE_API_KEY: ${DEVICE_API_KEY:-change-me}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  subscriber:
+    build: .
+    command: ["python", "-m", "app.mqtt_subscriber"]
+    environment:
+      DATABASE_URL: postgresql://coldchain:coldchain@db:5432/coldchain
+      MQTT_HOST: mqtt
+      MQTT_PORT: "1883"
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  pgdata:

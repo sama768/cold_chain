@@ -1,0 +1,15 @@
+firmware/cold_chain_esp32/cold_chain_config.h
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+
+# Private keys and local certificates
+*.key
+*_key.pem
+backend/certs/dev_cert.pem
+
+# Local firmware credentials
+firmware/cold_chain_esp32/cold_chain_config.h
